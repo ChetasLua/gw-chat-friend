@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0f14" media="(prefers-color-scheme: dark)">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
+<title>Private access</title>
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOSIgZmlsbD0iIzRmNWJkNSIvPjxwYXRoIGQ9Ik0xMSAxNHYtMi41YTUgNSAwIDAgMSAxMCAwVjE0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cmVjdCB4PSI5IiB5PSIxNCIgd2lkdGg9IjE0IiBoZWlnaHQ9IjEwIiByeD0iMyIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==">
+<style>
+:root{
+  color-scheme:light dark;
+  --bg:#f5f6f8;--bg2:#e9ebf2;--card:#fff;--ink:#14161c;--muted:#5b6170;--line:#dde0e8;
+  --accent:#4f5bd5;--accent-ink:#fff;--accent-soft:rgba(79,91,213,.12);--danger:#c62839;--focus:rgba(79,91,213,.4);
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 14px 36px rgba(16,24,40,.09);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0d0f14;--bg2:#161a25;--card:#151922;--ink:#eceef3;--muted:#9aa1b2;--line:#272c38;
+    --accent:#8790ff;--accent-ink:#0d0f14;--accent-soft:rgba(135,144,255,.16);--danger:#ff8793;--focus:rgba(135,144,255,.5);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 18px 44px rgba(0,0,0,.5);
+  }
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{
+  margin:0;padding:24px;display:grid;place-items:center;
+  font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color:var(--ink);background:radial-gradient(1100px 560px at 50% -12%,var(--bg2),var(--bg));-webkit-text-size-adjust:100%;
+}
+.card{width:100%;max-width:420px;padding:34px 28px 26px;border:1px solid var(--line);border-radius:22px;background:var(--card);box-shadow:var(--shadow)}
+.badge{display:grid;place-items:center;width:48px;height:48px;margin:0 0 18px;border-radius:14px;color:var(--accent);background:var(--accent-soft)}
+.badge svg{width:24px;height:24px}
+h1{margin:0 0 6px;font-size:23px;line-height:1.25;font-weight:650;letter-spacing:-.01em}
+.sub{margin:0 0 22px;color:var(--muted);font-size:15px}
+label.lbl{display:block;margin:0 0 7px;font-size:14px;font-weight:600}
+.field{position:relative}
+input#code{
+  width:100%;height:50px;padding:0 74px 0 14px;border:1.5px solid var(--line);border-radius:12px;
+  font:600 17px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em;
+  color:var(--ink);background:transparent;outline:none;transition:border-color .15s,box-shadow .15s;
+}
+input#code.mask{-webkit-text-security:disc}
+input#code:focus-visible{border-color:var(--accent);box-shadow:0 0 0 4px var(--focus)}
+input#code[aria-invalid=true]{border-color:var(--danger)}
+input#code[aria-invalid=true]:focus-visible{box-shadow:0 0 0 4px rgba(198,40,57,.22)}
+input#code:read-only{opacity:.7}
+#peek{
+  position:absolute;top:7px;right:7px;height:36px;padding:0 12px;border:0;border-radius:9px;
+  font:600 13px/1 inherit;color:var(--muted);background:transparent;cursor:pointer;
+}
+#peek:hover{color:var(--ink);background:var(--accent-soft)}
+#peek:focus-visible,#remember:focus-visible,#go:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.hint{margin:8px 2px 0;color:var(--muted);font-size:13px}
+.check{display:flex;gap:10px;align-items:center;margin:16px 2px 18px;font-size:14px;cursor:pointer;user-select:none}
+.check input{width:18px;height:18px;margin:0;accent-color:var(--accent)}
+#go{
+  display:block;width:100%;height:50px;border:0;border-radius:12px;font:650 16px/1 inherit;
+  color:var(--accent-ink);background:var(--accent);cursor:pointer;transition:filter .15s,transform .05s;
+}
+#go:hover{filter:brightness(1.07)}
+#go:active{transform:translateY(1px)}
+#go[aria-disabled=true]{cursor:default;filter:grayscale(.5) opacity(.65);transform:none}
+.bar{height:4px;margin-top:18px;overflow:hidden;border-radius:99px;background:var(--accent-soft)}
+.bar i{display:block;width:38%;height:100%;border-radius:99px;background:var(--accent);animation:slide 1.1s ease-in-out infinite}
+@keyframes slide{from{transform:translateX(-110%)}to{transform:translateX(270%)}}
+.status,.err{min-height:22px;margin:14px 2px 0;font-size:14px}
+.status{color:var(--muted)}
+.err{margin-top:4px;color:var(--danger);font-weight:550}
+.foot{margin:18px 2px 0;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;text-align:center}
+noscript p{max-width:420px;margin:0;color:var(--danger);text-align:center}
+@media (prefers-reduced-motion:reduce){.bar i{width:100%;opacity:.55;animation:none}input#code,#go{transition:none}}
+</style>
+</head>
+<body>
+<main class="card" id="card" aria-labelledby="title" aria-busy="false">
+  <div class="badge" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>
+  </div>
+  <h1 id="title">Private access</h1>
+  <p class="sub">Enter your access code to open the app.</p>
+
+  <label class="lbl" for="code">Access code</label>
+  <div class="field">
+    <input id="code" class="mask" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="go" maxlength="128" aria-describedby="hint err" aria-invalid="false" data-lpignore="true" data-1p-ignore data-bwignore>
+    <button id="peek" type="button" aria-controls="code">Show</button>
+  </div>
+  <p class="hint" id="hint">Dashes, spaces and letter case don't matter.</p>
+
+  <label class="check"><input id="remember" type="checkbox"><span>Remember on this device (30 days)</span></label>
+  <button id="go" type="button">Unlock</button>
+
+  <div class="bar" id="bar" role="progressbar" aria-label="Unlocking" hidden><i></i></div>
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+  <p class="err" id="err" role="alert" aria-live="assertive"></p>
+  <p class="foot">The code is checked on this device and is never sent anywhere.</p>
+</main>
+<noscript><p>JavaScript is required to unlock this page.</p></noscript>
+
+<script type="module">
+(() => {
+  'use strict';
+  /* Access-code cryptography shared by the lock page, the build and the deploy tooling (docs/SPEC.md 4.3).
+   Web Crypto + CompressionStream only, so the same file runs in Node >= 20 and in current browsers.
+   It never logs, and no error message ever contains a code, a key, a proof or a ciphertext byte.
+   The lock page inlines this file with the leading `export ` removed from each declaration: keep every export a plain
+   `export function|const|class` declaration (no export lists, no imports). */
+
+const te = new TextEncoder();
+
+const MIN_CODE_LENGTH = 16;
+const MIN_CODE_BITS = 70;
+/** upper bound a page will accept from a manifest: a hostile m.json must not be able to freeze the browser */
+const MAX_ITERATIONS = 10_000_000;
+
+const MAGIC = [0x47, 0x57, 0x48, 0x31];     // "GWH1"
+const IV_LEN = 12;
+const TAG_LEN = 16;
+const HEADER = MAGIC.length + IV_LEN;
+
+/** code: 'BAD_KEY' (AES-GCM refused: wrong code, or the file was altered) | 'BAD_FILE' (not a chunk this build wrote) */
+class KdfError extends Error {
+  constructor(code, message) {
+    super(message);
+    this.name = 'KdfError';
+    this.code = code;
+  }
+}
+
+/** string | ArrayBuffer | typed array -> Uint8Array view (no copy). Realm-agnostic on purpose (no instanceof). */
+const toBytes = (d) => (typeof d === 'string' ? te.encode(d) : ArrayBuffer.isView(d) ? new Uint8Array(d.buffer, d.byteOffset, d.byteLength) : new Uint8Array(d));
+
+/** bytes -> unpadded base64url */
+function b64urlEncode(bytes) {
+  const u8 = toBytes(bytes);
+  let bin = '';
+  for (let i = 0; i < u8.length; i += 0x8000) bin += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+/** unpadded base64url -> bytes. Throws TypeError on anything that is not strict base64url (no padding, whitespace, '+' or '/'). */
+function b64urlDecode(s) {
+  if (typeof s !== 'string' || !/^[A-Za-z0-9_-]*$/.test(s) || s.length % 4 === 1) throw new TypeError('invalid base64url');
+  const bin = atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4));
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+/** lower-case hex SHA-256 of a string (UTF-8) or bytes */
+async function sha256Hex(data) {
+  const d = new Uint8Array(await crypto.subtle.digest('SHA-256', toBytes(data)));
+  let hex = '';
+  for (const b of d) hex += b.toString(16).padStart(2, '0');
+  return hex;
+}
+
+/** What the user types and what we derive from are the same string: case, spaces and dashes never matter. */
+function normalizeCode(s) {
+  if (typeof s !== 'string') throw new TypeError('access code must be a string');
+  return s.normalize('NFKC').toUpperCase().replace(/[\s-]+/g, '');
+}
+
+const KEY_ROWS = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM', '1234567890'];
+const nextTo = (a, b) => {
+  if (a === b) return true;
+  if (Math.abs(a.codePointAt(0) - b.codePointAt(0)) === 1) return true;      // ABC, 123 and their reverse
+  return KEY_ROWS.some((r) => r.includes(a) && r.includes(b) && Math.abs(r.indexOf(a) - r.indexOf(b)) === 1);   // QWE, ASD
+};
+
+/** Estimated guessing entropy, in bits, of a code a human may have chosen. Deliberately crude and deliberately pessimistic:
+ *    pool = sum of the character classes present (digits 10, letters 26, ASCII punctuation 31, anything non-ASCII 100)
+ *    bits = log2(pool) x (number of characters that add information)
+ *  A character adds nothing when it repeats, or steps by one from, the character before it (AAAA, ABCD, 4321, QWERTY),
+ *  or when it belongs to a 3-character group that already occurred earlier (PASSWORDPASSWORD, ABXABXABX).
+ *  Random codes from scripts/gen-access-code.mjs lose about two characters to this (20 symbols -> ~93 bits, real 99).
+ *  It cannot know dictionary words: it guards against typos and lazy codes, it does not replace generating the code. */
+function estimateEntropyBits(code) {
+  const chars = Array.from(normalizeCode(code));
+  if (!chars.length) return 0;
+  const has = (re) => chars.some((c) => re.test(c));
+  const pool = (has(/[0-9]/) ? 10 : 0) + (has(/[A-Z]/) ? 26 : 0) + (has(/[!-/:-@[-`{-~]/) ? 31 : 0) + (has(/[^\x00-\x7f]/) ? 100 : 0);
+  if (!pool) return 0;
+  const repeated = new Array(chars.length).fill(false);
+  const seen = new Set();
+  for (let i = 0; i + 3 <= chars.length; i++) {
+    const g = chars.slice(i, i + 3).join('');
+    if (seen.has(g)) repeated[i] = repeated[i + 1] = repeated[i + 2] = true;
+    else seen.add(g);
+  }
+  let useful = 0;
+  for (let i = 0; i < chars.length; i++) if (i === 0 || (!repeated[i] && !nextTo(chars[i - 1], chars[i]))) useful++;
+  return useful * Math.log2(pool);
+}
+
+/** The 64 bytes everything else is cut from: PBKDF2-HMAC-SHA-256(normalised code, SHA-256("gw-hosted/salt/v1:" + siteId)). */
+async function deriveBits(code, siteId, iterations) {
+  const pw = normalizeCode(code);
+  if (!pw) throw new TypeError('access code is empty');
+  if (typeof siteId !== 'string' || !siteId) throw new TypeError('siteId must be a non-empty string');
+  if (!Number.isInteger(iterations) || iterations < 1 || iterations > MAX_ITERATIONS) throw new RangeError('iterations out of range');
+  const salt = new Uint8Array(await crypto.subtle.digest('SHA-256', te.encode('gw-hosted/salt/v1:' + siteId)));
+  const key = await crypto.subtle.importKey('raw', te.encode(pw), 'PBKDF2', false, ['deriveBits']);
+  return new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations }, key, 512));
+}
+
+const checkBits = (bits) => {
+  const b = toBytes(bits);
+  if (b.length !== 64) throw new TypeError('bits must be 64 bytes');
+  return b;
+};
+const aad = (name) => {
+  if (typeof name !== 'string' || !name) throw new TypeError('chunk name must be a non-empty string');
+  return te.encode('gw-hosted/v1/' + name);
+};
+
+/** What the Worker is given as ACCESS_PROOF and what the browser sends to /auth: HMAC-SHA256(bits[32..64], "gw-hosted/auth/v1") as base64url.
+ *  It proves knowledge of the code without being able to decrypt anything (the AES key is the other half of the bits). */
+async function proofFromBits(bits) {
+  const key = await crypto.subtle.importKey('raw', checkBits(bits).subarray(32), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return b64urlEncode(new Uint8Array(await crypto.subtle.sign('HMAC', key, te.encode('gw-hosted/auth/v1'))));
+}
+
+// Compression runs through a stream pair; write and close must not be awaited before reading starts (backpressure would deadlock).
+async function pump(stream, bytes) {
+  const w = stream.writable.getWriter();
+  w.write(bytes).catch(() => {});      // a failure reaches the caller through the readable side
+  w.close().catch(() => {});
+  const r = stream.readable.getReader();
+  const parts = [];
+  let size = 0;
+  for (;;) {
+    const { value, done } = await r.read();
+    if (done) break;
+    parts.push(value);
+    size += value.length;
+  }
+  const out = new Uint8Array(size);
+  let at = 0;
+  for (const p of parts) {
+    out.set(p, at);
+    at += p.length;
+  }
+  return out;
+}
+
+/** "GWH1" || iv (12 random bytes) || AES-256-GCM(bits[0..32], iv, aad = "gw-hosted/v1/" + name, gzip(bytes)).
+ *  The name is authenticated, so a chunk cannot be passed off as another one. A fresh random IV per call. */
+async function encryptChunk(bits, name, bytes) {
+  const key = await crypto.subtle.importKey('raw', checkBits(bits).subarray(0, 32), 'AES-GCM', false, ['encrypt']);
+  const iv = crypto.getRandomValues(new Uint8Array(IV_LEN));
+  const gz = await pump(new CompressionStream('gzip'), toBytes(bytes));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: aad(name) }, key, gz));
+  const out = new Uint8Array(HEADER + ct.length);
+  out.set(MAGIC, 0);
+  out.set(iv, MAGIC.length);
+  out.set(ct, HEADER);
+  return out;
+}
+
+/** Inverse of encryptChunk. Throws KdfError: 'BAD_KEY' when authentication fails (wrong code or altered file), 'BAD_FILE' otherwise. */
+async function decryptChunk(bits, name, fileBytes) {
+  const key = await crypto.subtle.importKey('raw', checkBits(bits).subarray(0, 32), 'AES-GCM', false, ['decrypt']);
+  const f = toBytes(fileBytes);
+  const additionalData = aad(name);
+  if (f.length < HEADER + TAG_LEN || MAGIC.some((m, i) => f[i] !== m)) throw new KdfError('BAD_FILE', 'not a GWH1 chunk');
+  let gz;
+  try {
+    gz = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: f.subarray(MAGIC.length, HEADER), additionalData }, key, f.subarray(HEADER)));
+  } catch {
+    throw new KdfError('BAD_KEY', 'decryption failed');
+  }
+  try {
+    return await pump(new DecompressionStream('gzip'), gz);
+  } catch {
+    throw new KdfError('BAD_FILE', 'chunk is not valid gzip');
+  }
+}
+
+  const CFG = {"v":1,"siteId":"YxgDaAeIJWKDyYcAgFKH8w","iterations":800000};
+
+  const MANIFEST_URL = 'm.json';
+  const PROOF_KEY = 'gwh.proof';
+  const REMEMBER_KEY = 'gwh.remember';
+  const REMEMBER_MS = 30 * 24 * 60 * 60 * 1000;
+  const FREE_TRIES = 5;
+
+  const TEXT = {
+    unlock: 'Unlock',
+    checking: 'Checking the code…',
+    opening: 'Opening…',
+    resuming: 'Unlocking this device…',
+    empty: 'Enter your access code.',
+    wrong: "That code doesn't match. Check it and try again.",
+    net: "Can't reach the site files. Check your connection, then press Unlock again.",
+    corrupt: 'The download was incomplete. Press Unlock to try again.',
+    stale: 'This page is out of date. Reload it, then try again.',
+    storage: 'This browser is blocking site storage, so the app cannot start. Allow site data (or leave private mode), then reload.',
+    unsupported: "This browser can't run the secure unlock. Use a current Chrome, Edge, Firefox or Safari over HTTPS.",
+    unknown: 'Something went wrong. Reload the page and try again.',
+    forgotten: 'The code saved on this device no longer works. Enter your code again.',
+    cooldown: (s) => `Too many attempts. You can try again in ${s} s.`,
+    wait: (s) => `Wait ${s} s`,
+  };
+
+  // The only global this page creates; it also tells the app, once it has been written over this document, that it came through the lock.
+  const boot = (window.__GWH_BOOT__ = { v: 1, state: 'locked' });
+
+  const $ = (id) => document.getElementById(id);
+  const ui = { card: $('card'), code: $('code'), peek: $('peek'), remember: $('remember'), go: $('go'), bar: $('bar'), status: $('status'), err: $('err') };
+
+  // What went wrong decides what the person is told: 'wrong' they can fix, 'net' and 'corrupt' they retry, 'stale' needs a reload.
+  class PageError extends Error {
+    constructor(kind) {
+      super(kind);
+      this.kind = kind;
+    }
+  }
+
+  let working = false;
+  let blocked = false;
+  let done = false;
+  let fails = 0;
+  let lockedUntil = 0;
+  let ticker = 0;
+
+  /* ── the two files this page may ask for: the manifest and the chunk it names ── */
+
+  async function get(url, init) {
+    let res;
+    try {
+      res = await fetch(url, { credentials: 'omit', referrerPolicy: 'no-referrer', ...init });
+    } catch {
+      throw new PageError('net');
+    }
+    if (!res.ok) throw new PageError('net');
+    return res;
+  }
+
+  async function loadManifest() {
+    const res = await get(MANIFEST_URL, { cache: 'no-store' });
+    let m;
+    try {
+      m = await res.json();
+    } catch {
+      throw new PageError('net');
+    }
+    const c = m && m.chunks && m.chunks.app;
+    // the manifest must describe the same site this page was built for; anything else is a stale page or a stale cache
+    if (!m || m.v !== 1 || m.siteId !== CFG.siteId || m.iterations !== CFG.iterations) throw new PageError('stale');
+    if (!c || typeof c.file !== 'string' || !/^a\/[0-9a-f]{16}\.bin$/.test(c.file) || !Number.isInteger(c.size) || c.size < 1) throw new PageError('stale');
+    return { file: c.file, size: c.size };
+  }
+
+  async function loadChunk() {
+    const m = await manifest();
+    const res = await get(m.file);
+    let bytes;
+    try {
+      bytes = new Uint8Array(await res.arrayBuffer());
+    } catch {
+      throw new PageError('net');
+    }
+    // the file name is the first 16 hex of its SHA-256: a truncated or substituted download is told apart from a wrong code
+    if (bytes.length !== m.size || (await sha256Hex(bytes)).slice(0, 16) !== m.file.slice(2, 18)) throw new PageError('corrupt');
+    return { bytes, file: m.file };
+  }
+
+  // one request each, shared; a failure is forgotten so the next attempt asks again
+  let manifestP = null;
+  let chunkP = null;
+  const manifest = () => (manifestP ||= loadManifest().catch((e) => { manifestP = null; throw e; }));
+  const chunk = () => (chunkP ||= loadChunk().catch((e) => { chunkP = null; throw e; }));
+
+  /* ── screen ── */
+
+  function render() {
+    ui.go.setAttribute('aria-disabled', String(working || blocked || Date.now() < lockedUntil));
+    ui.code.readOnly = working || blocked;
+    ui.card.setAttribute('aria-busy', String(working));
+    ui.bar.hidden = !working;
+    boot.state = done ? 'unlocked' : working ? 'busy' : blocked ? 'unsupported' : 'locked';
+  }
+
+  function say(text) {
+    ui.status.textContent = text;
+  }
+
+  function problem(kind, text = TEXT[kind]) {
+    ui.err.textContent = text;
+    const bad = kind === 'wrong' || kind === 'empty';
+    ui.code.setAttribute('aria-invalid', String(bad));
+    ui.code.focus();
+    if (kind === 'wrong') ui.code.select();
+  }
+
+  function cooldown(seconds) {
+    lockedUntil = Date.now() + seconds * 1000;
+    render();
+    clearInterval(ticker);
+    const tick = () => {
+      const left = Math.ceil((lockedUntil - Date.now()) / 1000);
+      if (left > 0) { ui.go.textContent = TEXT.wait(left); return; }
+      clearInterval(ticker);
+      ui.go.textContent = TEXT.unlock;
+      ui.err.textContent = '';
+      render();
+    };
+    ticker = setInterval(tick, 500);
+    tick();
+    problem('wrong', TEXT.cooldown(seconds));            // announced once; the countdown itself lives on the (non-live) button
+  }
+
+  function mask(on) {
+    ui.code.classList.toggle('mask', on);
+    ui.peek.textContent = on ? 'Show' : 'Hide';
+  }
+
+  /* ── unlocking ── */
+
+  async function decryptApp(bits, file) {
+    try {
+      return new TextDecoder().decode(await decryptChunk(bits, 'app', file.bytes));
+    } catch (e) {
+      throw new PageError(e && e.code === 'BAD_KEY' ? 'wrong' : 'corrupt');
+    }
+  }
+
+  const forget = () => {
+    try { localStorage.removeItem(REMEMBER_KEY); } catch { /* storage may be unavailable */ }
+  };
+
+  // Hand the app its proof (same tab, same origin) and replace this document with it. `remember`: 'new' stores the key for 30 days,
+  // 'keep' leaves the stored entry alone, anything else removes it.
+  async function handOff(html, bits, remember, file) {
+    const proof = await proofFromBits(bits);
+    try {
+      sessionStorage.setItem(PROOF_KEY, proof);
+    } catch {
+      throw new PageError('storage');
+    }
+    if (remember === 'new') {
+      try {
+        localStorage.setItem(REMEMBER_KEY, JSON.stringify({ bits: b64urlEncode(bits), until: Date.now() + REMEMBER_MS, siteId: CFG.siteId, file }));
+      } catch { /* remembering is optional */ }
+    } else if (remember !== 'keep') forget();
+    bits.fill(0);
+    ui.code.value = '';
+    clearInterval(ticker);
+    done = true;
+    render();
+    document.open();
+    document.write(html);
+    document.close();
+  }
+
+  async function submit() {
+    if (working || done || Date.now() < lockedUntil) return;
+    const code = ui.code.value;
+    ui.err.textContent = '';
+    if (!normalizeCode(code)) { problem('empty'); return; }
+    working = true;
+    ui.code.setAttribute('aria-invalid', 'false');
+    say(TEXT.checking);
+    render();
+    try {
+      const download = chunk();
+      download.catch(() => {});                          // started now, awaited below: the download overlaps the key derivation
+      const bits = await deriveBits(code, CFG.siteId, CFG.iterations);
+      say(TEXT.opening);
+      const file = await download;
+      const html = await decryptApp(bits, file);
+      fails = 0;
+      await handOff(html, bits, ui.remember.checked ? 'new' : 'none', file.file);
+    } catch (e) {
+      const kind = e instanceof PageError ? e.kind : 'unknown';
+      working = false;
+      say('');
+      render();
+      if (kind === 'wrong' && ++fails >= FREE_TRIES) cooldown(Math.min(60, 3 * 2 ** (fails - FREE_TRIES)));
+      else problem(kind);
+      return;
+    }
+    working = false;
+  }
+
+  // A key saved on this device opens the app without asking. A refused key is forgotten; a network problem keeps it for next time.
+  async function resume() {
+    let bits = null;
+    try {
+      const raw = localStorage.getItem(REMEMBER_KEY);
+      if (!raw) return false;
+      const entry = JSON.parse(raw);
+      if (!entry || typeof entry !== 'object' || entry.siteId !== CFG.siteId || !(entry.until > Date.now())) throw new Error('not for this site, or expired');
+      bits = b64urlDecode(entry.bits);
+      if (bits.length !== 64) throw new Error('wrong size');
+    } catch {
+      forget();                                          // expired, from another site, damaged or unreadable: it can never work
+      return false;
+    }
+    working = true;
+    say(TEXT.resuming);
+    render();
+    try {
+      const file = await chunk();
+      await handOff(await decryptApp(bits, file), bits, 'keep', file.file);
+      return true;
+    } catch (e) {
+      const kind = e instanceof PageError ? e.kind : 'unknown';
+      working = false;
+      say('');
+      render();
+      if (kind === 'wrong') { forget(); say(TEXT.forgotten); } else problem(kind);
+      return false;
+    }
+  }
+
+  /* ── start ── */
+
+  const supported = Boolean(window.crypto && crypto.subtle && typeof CompressionStream === 'function' && typeof DecompressionStream === 'function' && typeof fetch === 'function');
+
+  ui.go.addEventListener('click', submit);
+  ui.code.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); submit(); }
+  });
+  ui.code.addEventListener('input', () => {
+    ui.code.setAttribute('aria-invalid', 'false');
+    if (Date.now() >= lockedUntil) ui.err.textContent = '';
+  });
+  ui.peek.addEventListener('click', () => mask(!ui.code.classList.contains('mask')));
+  if (!(window.CSS && CSS.supports && CSS.supports('-webkit-text-security', 'disc'))) {
+    ui.code.classList.remove('mask');                    // no way to hide the characters here, so do not offer a toggle that does nothing
+    ui.peek.hidden = true;
+  }
+
+  if (!supported) {
+    blocked = true;
+    render();
+    problem('unsupported');
+  } else {
+    manifest().then(chunk).catch(() => {});              // warm up while the person types; a failure is reported when they press Unlock
+    resume().then((opened) => { if (!opened) ui.code.focus(); });
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "v": 1,
+  "siteId": "YxgDaAeIJWKDyYcAgFKH8w",
+  "iterations": 800000,
+  "chunks": {
+    "app": {
+      "file": "a/c4d4ffdb5fbd3aa6.bin",
+      "size": 1956371
+    }
+  }
+}
